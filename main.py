@@ -20,9 +20,21 @@ async def greetings(
     name: str,
     surname: str,
     age: int | None = None,
+    is_staff: bool = False,
 ) -> dict[str, str]:
-    result = f'Hello: {name.capitalize()}'
-    return {'greetings': result}
+    # Объединяем имя и фамилию в единую строку:
+    result = ' '.join([name, surname])
+    # Выводим все слова с заглавной буквы:
+    result = result.title()
+    if age is not None:
+        # Добавляем к выводу возраст (если есть);
+        # приводим число age к строке.
+        result += ', ' + str(age)
+    # Если is_staff равен True...
+    if is_staff:
+        # ...дописываем слово "сотрудник".
+        result += ', сотрудник'
+    return {'Hello': result}
 
 
 # А почему async? А потому что мы пишем асинхронное приложение!
