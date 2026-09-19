@@ -1,7 +1,15 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import Optional, Union, Self
 
-from pydantic import BaseModel, Field
+from pydantic import (
+    BaseModel,
+    Field,
+    ConfigDict,
+    field_validator,
+    model_validator,
+)
+
+import re
 
 
 class EducationLevel(str, Enum):
@@ -29,3 +37,35 @@ class Person(BaseModel):
         alias='is-staff',
     )
     education_level: Optional[EducationLevel] = None
+
+    # «убрать лишние пробелы в строковых значениях»
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+    )
+
+    # Первый параметр функции-валидатора должен называться строго cls.
+    # Во второй параметр передаётся значение проверяемого поля.
+    @field_validator('name', 'surname')
+    def cannot_be_numbers(cls, value: str):
+        # в assert указываем проверочное условие
+        # и сообщение об ошибке (опционально)
+        assert (
+            not value.isnumeric()
+        ), 'Имя и фамилия не должны состоять из цифр'
+
+        return value
+
+    @model_validator(mode='after')
+    def using_different_languages(self) -> Self:
+        surname = ''.join(self.surname)
+
+        checked_value = self.name + surname
+
+        if re.search('[а-я]', checked_value, re.IGNORECASE) and re.search(
+            '[a-z]', checked_value, re.IGNORECASE
+        ):
+            raise ValueError(
+                'Пожалуйста, не смешивайте русские и латинские буквы'
+            )
+
+        return self
