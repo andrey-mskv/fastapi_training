@@ -1,12 +1,13 @@
-from fastapi import FastAPI
-from enum import StrEnum
+from enum import Enum
 from typing import Optional
+
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
 
 
-class EducationLevel(StrEnum):
+class EducationLevel(str, Enum):
     SECONDARY = 'Среднее образование'
     SPECIAL = 'Среднее специальное образование'
     HIGHER = 'Высшее образование'
@@ -14,7 +15,7 @@ class EducationLevel(StrEnum):
 
 class Person(BaseModel):
     name: str
-    surname: str
+    surname: str | list[str]
     age: Optional[int] = None
     is_staff: bool = False
     education_level: Optional[EducationLevel] = None
@@ -27,22 +28,16 @@ class Person(BaseModel):
     response_description='Полная строка приветствия',
 )
 async def greetings(person: Person) -> dict[str, str]:
-    """
-    Приветствие пользователя:
-
-    - **name**: имя
-    - **surname**: фамилия
-    - **age**: возраст (опционально)
-    - **education_level**: уровень образования (опционально)
-    """
-    result = ' '.join([person.name, person.surname])
+    if isinstance(person.surname, list):
+        surnames = ' '.join(person.surname)
+    else:
+        surnames = person.surname
+    result = ' '.join([person.name, surnames])
     result = result.title()
     if person.age is not None:
         result += ', ' + str(person.age)
-
     if person.education_level is not None:
         result += ', ' + person.education_level.lower()
-
     if person.is_staff:
         result += ', сотрудник'
     return {'Hello': result}
