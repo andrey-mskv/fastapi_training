@@ -23,12 +23,21 @@ async def hello_author():
     response_description='Полная строка приветствия',
 )
 async def greetings(
-    # Описание path- и query-параметров
-    name: Annotated[str, Path(min_length=2, max_length=20)],
+    name: Annotated[
+        str,
+        Path(
+            min_length=2,
+            max_length=20,
+            title='Полное имя',
+            description='Можно вводить в любом регистре',
+        ),
+    ],
     surname: Annotated[str, Query(min_length=2, max_length=50)],
     age: Annotated[Optional[int], Query(gt=4, lt=100)] = None,
-    is_staff: bool = False,
-    education_level: EducationLevel | None = None,
+    is_staff: Annotated[bool, Query(alias='is-staff')] = False,
+    education_level: Annotated[
+        Optional[EducationLevel], Query(alias='education-level')
+    ] = None,
 ) -> dict[str, str]:
     """
     Приветствие пользователя:
