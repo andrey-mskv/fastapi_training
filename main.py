@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Path, Query
 from enum import StrEnum
+from typing import Annotated, Optional
 
 app = FastAPI()
 
@@ -22,11 +23,10 @@ async def hello_author():
     response_description='Полная строка приветствия',
 )
 async def greetings(
-    # Устанавливаем ограничение для path-параметра:
-    name: str = Path(min_length=2, max_length=20),
-    # Устанавливаем ограничение для query-параметра:
-    surname: str = Query(min_length=2, max_length=50),
-    age: int | None = None,
+    # Описание path- и query-параметров
+    name: Annotated[str, Path(min_length=2, max_length=20)],
+    surname: Annotated[str, Query(min_length=2, max_length=50)],
+    age: Annotated[Optional[int], Query(gt=4, lt=100)] = None,
     is_staff: bool = False,
     education_level: EducationLevel | None = None,
 ) -> dict[str, str]:
