@@ -1,20 +1,6 @@
 from fastapi import FastAPI
-from app.schemas.schemas import Person
+from app.api.endpoints import router
 
 app = FastAPI()
 
-
-@app.post('/hello')
-async def greetings(person: Person) -> dict[str, str]:
-    if isinstance(person.surname, list):
-        surnames = ' '.join(person.surname)
-    else:
-        surnames = person.surname
-    result = ' '.join([person.name, surnames])
-    if person.age is not None:
-        result += ', ' + str(person.age)
-    if person.education_level is not None:
-        result += ', ' + person.education_level.lower()
-    if person.is_staff:
-        result += ', сотрудник'
-    return {'Hello': result}
+app.include_router(router)
