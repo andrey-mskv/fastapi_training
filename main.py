@@ -34,7 +34,11 @@ async def greetings(
     ],
     surname: Annotated[str, Query(min_length=2, max_length=50)],
     age: Annotated[Optional[int], Query(gt=4, lt=100)] = None,
-    is_staff: Annotated[bool, Query(alias='is-staff')] = False,
+    is_staff: Annotated[
+        bool,
+        # Добавляем параметр include_in_schema
+        Query(alias='is-staff', include_in_schema=False),
+    ] = False,
     education_level: Annotated[
         Optional[EducationLevel], Query(alias='education-level')
     ] = None,
@@ -45,7 +49,6 @@ async def greetings(
     - **name**: имя
     - **surname**: фамилия
     - **age**: возраст (опционально)
-    - **is_staff**: является ли пользователь сотрудником
     - **education_level**: уровень образования (опционально)
     """
     result = ' '.join([name, surname])
